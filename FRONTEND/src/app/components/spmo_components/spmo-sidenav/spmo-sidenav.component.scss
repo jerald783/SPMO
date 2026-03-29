@@ -1,0 +1,314 @@
+/* ==========================================================================
+   1. VARIABLES
+   ========================================================================== */
+$side-expanded: 280px;
+$side-collapsed: 80px;
+$primary-maroon: #800000;
+$transition-main: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+/* ==========================================================================
+   2. CONTAINERS
+   ========================================================================== */
+.layout-wrapper,
+.sidenav-wrapper {
+  height: 100vh;
+}
+
+mat-sidenav-container {
+  background: transparent;
+}
+
+/* ==========================================================================
+   3. APP SIDENAV (LEFT SIDE)
+   ========================================================================== */
+.app-sidenav {
+  width: $side-expanded;
+  background: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  transition: width $transition-main !important;
+
+  &.collapsed {
+    width: $side-collapsed !important;
+
+    // Center everything in nav list
+    mat-nav-list a {
+      justify-content: center !important;
+      padding: 0 !important;
+      margin: 4px 8px;
+      mat-icon {
+        margin-right: 0 !important;
+      }
+    }
+
+    // Centering the Avatar in the footer
+    .sidenav-user {
+      padding: 16px 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    .user-btn {
+      justify-content: center !important;
+    }
+  }
+}
+
+/* --- Header & Logo Alignment --- */
+.logo-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 50px 10px 20px;
+  border-bottom: 1px solid #f3f4f6;
+  min-height: 180px;
+  transition: min-height $transition-main;
+
+  .app-sidenav.collapsed & {
+    min-height: 110px;
+    padding-top: 55px;
+  }
+}
+
+.menubtn {
+  position: absolute;
+  top: 5px;
+  right: 15px;
+  color: $primary-maroon;
+  z-index: 10;
+}
+
+.SPMOLogo {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  transition: all $transition-main;
+
+  .app-sidenav.collapsed & {
+    width: 44px;
+    height: 44px;
+  }
+}
+.title-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 12px;
+}
+.system-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: $primary-maroon;
+  white-space: nowrap;
+  margin-top: 8px;
+}
+.system-subtitle {
+  font-size: 11px;
+  color: #6b7280;
+  margin-top: 2px;
+  text-align: center;
+}
+
+/* --- Navigation Links --- */
+mat-nav-list a {
+  display: flex !important;
+  align-items: center;
+  border-radius: 10px;
+  margin: 4px 12px;
+  height: 48px !important;
+  color: #4b5563;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(128, 0, 0, 0.05);
+  }
+
+  mat-icon {
+    color: $primary-maroon;
+    margin-right: 12px;
+  }
+}
+
+.active-link {
+  background: rgba(128, 0, 0, 0.1) !important;
+  color: $primary-maroon !important;
+  border-left: 4px solid $primary-maroon;
+  font-weight: 600;
+}
+
+.submenu {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+  background: #f9fafb;
+  margin: 0 10px;
+  border-radius: 8px;
+  &.open {
+    max-height: 200px;
+  }
+}
+
+/* ==========================================================================
+   4. USER SECTION (AVATAR CENTERING)
+   ========================================================================== */
+.sidenav-user {
+  padding: 16px;
+  background: #fcfcfc;
+  border-top: 1px solid #f3f4f6;
+  margin-top: auto;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center; // 🔥 horizontal center
+  justify-content: center; // 🔥 vertical center (if height allows)
+}
+.user-btn {
+  width: 100%;
+  display: flex !important;
+  flex-direction: column; // stack avatar + text
+  align-items: center; // center horizontally
+  justify-content: center;
+  text-align: center;
+  outline: none;
+}
+
+.user-details {
+  text-align: left;
+  margin-left: 12px;
+  .user-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1f2937;
+    display: block;
+  }
+  .user-email {
+    font-size: 11px;
+    color: #6b7280;
+  }
+}
+
+.email-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  flex-shrink: 0;
+  outline: none;
+}
+
+/* ==========================================================================
+   5. RIGHT CONTENT AREA (DYNAMIC MARGIN FIX)
+   ========================================================================== */
+.right-content {
+  flex: 1;
+  background: #f3f4f6;
+  display: flex;
+  flex-direction: column;
+  transition: margin-left $transition-main !important;
+  margin-left: $side-expanded !important;
+
+  &.content-collapsed {
+    margin-left: $side-collapsed !important;
+  }
+}
+
+.main-content {
+  position: relative;
+  padding-left: 3px;
+  min-height: calc(100vh - 50px);
+  background-color: #01361c;
+}
+
+.content-card {
+  background: white;
+
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  padding: 20px;
+  min-height: 100%;
+}
+
+footer {
+  height: 40px;
+  width: 100%;
+  background: white;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #9ca3af;
+  position: fixed;
+  bottom: 0;
+  z-index: 5;
+}
+
+/* --- Online Status --- */
+
+// .head-user-avatar { position: relative; }
+// .circle-indicator {
+//   width: 10px; height: 10px; background: #10b981;
+//   border: 2px solid white; border-radius: 50%;
+//   position: absolute; bottom: 0; right: 0;
+//   &.pulse { animation: pulse-anim 2s infinite; }
+// }
+
+// @keyframes pulse-anim {
+//   0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+//   70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+//   100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+// }
+/* ===== Avatar ===== */
+.head-user-avatar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.email-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.circle-indicator {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  position: relative;
+  top: 2px;
+  right: 2px;
+  background: #029716;
+  border: 2px solid white;
+}
+
+.circle-indicator.pulse {
+  animation: pulse-animation 1.4s infinite;
+}
+
+@keyframes pulse-animation {
+  0% {
+    box-shadow: 0 0 0 0 rgba(2, 151, 22, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 0 12px rgba(2, 151, 22, 0);
+  }
+}
+.rotate {
+  transform: rotate(180deg);
+}

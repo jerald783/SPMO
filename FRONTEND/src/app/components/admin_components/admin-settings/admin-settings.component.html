@@ -1,0 +1,81 @@
+<div class="settings-container">
+
+  <div class="settings-header">
+    <h2>⚙️ System Settings</h2>
+    <p>University of the Philippines Mindanao Admin Configuration</p>
+  </div>
+
+  <mat-card class="settings-card">
+
+    <mat-tab-group class="up-tabs">
+
+      <!-- USER SETTINGS (commented out) -->
+      <!-- <mat-tab label="User Management"> ... </mat-tab> -->
+
+
+      <!-- SMTP SETTINGS -->
+      <mat-tab label="SMTP Settings">
+        <form [formGroup]="smtpForm" (ngSubmit)="updateSmtp()" class="settings-form">
+
+          <div class="form-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>SMTP Server</mat-label>
+              <input matInput formControlName="server">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Port</mat-label>
+              <input matInput formControlName="port">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Sender Name</mat-label>
+              <input matInput formControlName="senderName">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Sender Email</mat-label>
+              <input matInput formControlName="senderEmail">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Username</mat-label>
+              <input matInput formControlName="username">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Password</mat-label>
+              <input matInput type="password" formControlName="password">
+            </mat-form-field>
+          </div>
+
+          <div class="btn-area">
+            <button mat-raised-button class="btn-save" type="submit">
+              💾 Save SMTP Settings
+            </button>
+          </div>
+
+        </form>
+      </mat-tab>
+
+      <!-- GOOGLE AUTH -->
+      <mat-tab label="Google Auth">
+        <form [formGroup]="googleForm" (ngSubmit)="updateGoogle()" class="settings-form">
+          <mat-form-field appearance="outline" class="full">
+            <mat-label>Google Client ID</mat-label>
+            <input matInput formControlName="clientId">
+          </mat-form-field>
+
+          <div class="btn-area">
+            <button mat-raised-button class="btn-save" type="submit">
+              💾 Save Google Settings
+            </button>
+          </div>
+        </form>
+      </mat-tab>
+
+    </mat-tab-group>
+
+  </mat-card>
+
+</div>

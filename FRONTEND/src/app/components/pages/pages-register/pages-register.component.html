@@ -1,0 +1,110 @@
+<div class="register-wrapper">
+  <div class="register-card">
+
+    <h2 class="title">User Registration</h2>
+
+    <form (ngSubmit)="onSubmit()" #registrationForm="ngForm">
+
+      <!-- FULL NAME -->
+      <div class="form-group">
+        <label>Full Name</label>
+        <input
+          type="text"
+          class="form-control"
+          [(ngModel)]="FullName"
+          name="FullName"
+          required
+          placeholder="Enter your full name"
+        />
+      </div>
+
+      <!-- EMAIL -->
+      <div class="form-group">
+        <label>Email Address</label>
+        <input
+          type="email"
+          class="form-control"
+          [(ngModel)]="Email"
+          name="email"
+          [attr.pattern]="emailPattern"
+          required
+          #emailInput="ngModel"
+          placeholder="example@up.edu.ph"
+        />
+
+        <div *ngIf="emailInput.invalid && emailInput.touched" class="error">
+          <div *ngIf="emailInput.errors?.['required']">
+            Email is required.
+          </div>
+          <div *ngIf="emailInput.errors?.['pattern']">
+            Must be a valid up.edu.ph email.
+          </div>
+        </div>
+      </div>
+
+      <!-- PASSWORD -->
+      <div class="form-group">
+        <label>Password</label>
+        <input
+          type="password"
+          class="form-control"
+          [(ngModel)]="password"
+          name="password"
+          required
+          placeholder="Enter password"
+        />
+      </div>
+
+      <!-- ROLE (RADIO BUTTONS) -->
+      <div class="form-group">
+        <label>Role</label>
+
+        <div *ngFor="let role of roles"
+             class="form-check form-check-inline">
+
+          <input
+            class="form-check-input"
+            type="radio"
+            name="Role"
+            [value]="role.id"
+            [(ngModel)]="RoleId"
+            required
+          />
+
+          <label class="form-check-label">
+            {{ role.name }}
+          </label>
+
+        </div>
+
+      </div>
+
+      <!-- OTP -->
+      <div class="otp-section" *ngIf="showOtp">
+
+        <p class="otp-title">Email Verification</p>
+
+        <input
+          type="text"
+          class="form-control otp-input"
+          [(ngModel)]="otp"
+          name="otp"
+          placeholder="Enter verification code"
+          required
+        />
+
+      </div>
+
+      <!-- SUBMIT BUTTON -->
+      <button
+        type="submit"
+        class="submit-btn"
+        [disabled]="registrationForm.invalid"
+      >
+        {{ showOtp ? 'Verify Email' : 'Send Verification Email' }}
+      </button>
+
+    </form>
+
+  </div>
+</div>

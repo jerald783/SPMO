@@ -1,0 +1,130 @@
+<nav class="page">
+  <div class="split-layout">
+
+    <!-- LEFT PANEL (BRANDING / INFO) -->
+    <section class="left-panel">
+      <div class="overlay"></div>
+
+      <div class="left-content">
+        <img src="assets/img/UPM_LOGO.png" class="left-logo" />
+
+        <h1>Property Management Office</h1>
+        <h2>SPMO Staff Portal</h2>
+
+        <p class="tagline">
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. In quam delectus, ipsam ducimus ab quaerat placeat dolorum doloremque, consequuntur voluptatum nobis. Ducimus voluptas libero provident reiciendis, nisi eaque debitis. Mollitia!
+        </p>
+
+        <div class="info-box">
+          <h4>Mission</h4>
+          <p>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Quam praesentium nemo nobis delectus ipsa vel magnam, at voluptas, saepe totam tempora tempore voluptates architecto, dolores sunt ad quo ab nesciunt.
+          </p>
+        </div>
+
+        <div class="info-box">
+          <h4>Vision</h4>
+          <p>
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Tempora aut vitae in esse facere qui eligendi eaque officiis! Animi asperiores nam non nesciunt laudantium temporibus beatae ad dolorum explicabo tempora!
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT PANEL (LOGIN) -->
+    <section class="right-panel">
+      <div class="login-container">
+
+        <img src="assets/img/SPMO.png" class="login-logo" />
+
+        <h2>SPMO Staff Login</h2>
+        <p class="subtext">
+          Authorized personnel only. Sign in with your official account.
+        </p>
+
+        <p class="staff-note">
+          This portal is restricted to Property Management Office personnel only.
+        </p>
+
+        <form class="login-form" (ngSubmit)="onLogin()">
+
+          <div class="input-container">
+            <input
+              type="text"
+              id="Email"
+              [(ngModel)]="Email"
+              name="Email"
+              required
+              placeholder=" "
+            />
+            <label for="Email">Email</label>
+          </div>
+
+          <div class="input-container">
+            <div class="password-wrapper">
+              <input
+                [type]="showPassword ? 'text' : 'password'"
+                id="password"
+                [(ngModel)]="password"
+                name="password"
+                required
+                placeholder=" "
+              />
+              <label for="password">Password</label>
+
+              <mat-icon class="eye-icon" (click)="togglePasswordVisibility()">
+                {{ showPassword ? "visibility" : "visibility_off" }}
+              </mat-icon>
+            </div>
+          </div>
+
+          <button class="btn-custom" [disabled]="isSubmitting" type="submit">
+            Login
+          </button>
+
+          <div class="register-link">
+            <p>Account access is managed by the system administrator.</p>
+          </div>
+
+          <div class="forgot-password">
+            <a (click)="goToForgot()">Forgot Password?</a>
+          </div>
+
+          <div class="divider">
+            <span>OR</span>
+          </div>
+
+           <div class="google-login">
+              <div id="googleBtn"></div>
+            </div>
+
+          <p class="note">
+            *Only authorized SPMO institutional accounts are allowed
+          </p>
+
+          <p class="access-warning">
+            Unauthorized access is strictly prohibited.
+          </p>
+        </form>
+
+        <!-- LOCKOUT -->
+        <div *ngIf="lockoutUntil && now < lockoutUntil" class="lockout-timer">
+          <p>Account locked. Try again in:</p>
+          <span class="timer">
+            {{ countdownMinutes }}:{{ countdownSeconds < 10 ? "0" : "" }}{{ countdownSeconds }}
+          </span>
+        </div>
+
+        <!-- ERROR -->
+        <div
+          *ngIf="loginMessage && (!lockoutUntil || now >= lockoutUntil)"
+          class="login-message"
+        >
+          <p>{{ loginMessage }}</p>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+</nav>

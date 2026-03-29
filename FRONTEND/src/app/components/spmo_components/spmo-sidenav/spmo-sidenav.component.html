@@ -1,0 +1,90 @@
+<div class="layout-wrapper">
+  <mat-sidenav-container class="sidenav-wrapper">
+
+    <mat-sidenav 
+      #sidenav
+      mode="side" 
+      [opened]="true"
+      [class.collapsed]="!opened"
+      class="app-sidenav">
+
+      <div class="logo-container">
+        <button class="menubtn" mat-icon-button (click)="opened = !opened">
+          <mat-icon>{{ opened ? 'menu_open' : 'menu' }}</mat-icon>
+        </button>
+
+        <img src="assets/img/SPMO.png" alt="Logo" class="SPMOLogo" />
+        
+        <div class="title-wrapper" *ngIf="opened">
+          <h2 class="system-title">Inventory System</h2>
+          <span class="system-subtitle">SPMO Panel</span>
+        </div>
+      </div>
+
+      <mat-nav-list>
+        <a mat-list-item routerLinkActive="active-link" [routerLink]="[{ outlets: { secondary: ['dashboard'] } }]">
+          <mat-icon matListItemIcon>home</mat-icon>
+          <span class="nav-label" *ngIf="opened">Home</span>
+        </a>
+
+        <a mat-list-item (click)="toggleMasterFileMenu()" class="collapsible">
+          <mat-icon matListItemIcon>folder</mat-icon>
+          <span class="nav-label" *ngIf="opened">Master File</span>
+          <span class="spacer" *ngIf="opened"></span>
+          <mat-icon class="expand-icon" *ngIf="opened" [class.rotate]="isMasterFileMenuOpen">
+            expand_more
+          </mat-icon>
+        </a>
+
+        <div class="submenu" [class.open]="isMasterFileMenuOpen && opened">
+          <a mat-list-item class="sub-item" routerLinkActive="active-link" [routerLink]="[{ outlets: { secondary: ['spmoassets'] } }]">
+            <mat-icon matListItemIcon>inventory</mat-icon>
+            <span *ngIf="opened">Assets</span>
+          </a>
+        </div>
+
+        <a mat-list-item routerLinkActive="active-link" [routerLink]="[{ outlets: { secondary: ['admin-register'] } }]">
+          <mat-icon matListItemIcon>settings</mat-icon>
+          <span class="nav-label" *ngIf="opened">User Management</span>
+        </a>
+      </mat-nav-list>
+
+      <div class="sidenav-user">
+        <button mat-button class="user-btn" [matMenuTriggerFor]="userMenu">
+          <div class="head-user-avatar center">
+            <span class="email-avatar" [style.background-color]="getAvatarColor(fullName)">
+              {{ getInitials(fullName) }}
+            </span>
+            <div class="circle-indicator pulse"></div>
+          </div>
+          <div class="user-details" *ngIf="opened">
+            <span class="user-name">{{ fullName }}</span>
+            <span class="user-email">{{ Email }}</span>
+          </div>
+        </button>
+
+        <mat-menu #userMenu="matMenu">
+          <button mat-menu-item (click)="logOut()">
+            <mat-icon>logout</mat-icon>
+            <span>Logout</span>
+          </button>
+        </mat-menu>
+      </div>
+    </mat-sidenav>
+
+    <mat-sidenav-content class="right-content" [class.content-collapsed]="!opened">
+      <div class="main-content">
+        <div class="content-card">
+          <router-outlet name="secondary"></router-outlet>
+        </div>
+               <footer>
+        <div class="footer-content">SPMO • Inventory System v1.0.0</div>
+      </footer>
+ 
+      </div>
+   
+    </mat-sidenav-content>
+
+  </mat-sidenav-container>
+   
+</div>

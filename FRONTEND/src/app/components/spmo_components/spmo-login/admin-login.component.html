@@ -1,0 +1,47 @@
+<!-- src/app/components/login/login.component.html -->
+
+<div class="login-container">
+  
+    <h2>Login</h2>
+    
+    <form (ngSubmit)="onLogin()">
+      <div>
+        <label for="username">Username:</label>
+        <input
+          type="text"
+          id="username"
+          [(ngModel)]="username"
+          name="username"
+          required
+          placeholder="Enter username"
+        />
+      </div>
+      
+      <div class="password-container">
+        <label for="password">Password:</label>
+        <div class="password-wrapper">
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            id="password"
+            [(ngModel)]="password"
+            name="password"
+            required
+            placeholder="Enter password"
+          />
+          <mat-icon class="eye-icon" (click)="togglePasswordVisibility()">
+            {{ showPassword ? 'visibility_off' : 'visibility' }}
+          </mat-icon>
+        </div>
+      </div>
+      
+      
+      <button type="submit">Login</button>
+    </form>
+  
+    <div *ngIf="loginMessage" class="login-message">
+      <p>{{ loginMessage }}</p>
+    </div>
+  </div>
+
+  
+  

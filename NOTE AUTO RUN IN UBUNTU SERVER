@@ -1,0 +1,57 @@
+1. Wrap npm run start:all in a shell script
+    Create a startup script:
+        nano /home/administrator/ITS/start-all.sh
+
+    Paste this inside start-all.sh :
+        #!/bin/bash
+        cd /home/administrator/ITS/FRONTEND
+        npm run start:all
+
+    Make it executable:
+        chmod +x /home/administrator/ITS/start-all.sh
+
+2. Create a Systemd Service:
+    sudo nano /etc/systemd/system/start-all.service
+
+    Paste the following configuration inside start-all.service:
+
+    [Unit]
+    Description=Start Angular and ASP.NET Core Project
+    After=network.target
+
+    [Service]
+    Type=simple
+    WorkingDirectory=/home/administrator/ITS
+    ExecStart=/home/administrator/ITS/start-all.sh
+    Restart=always
+    RestartSec=10
+    User=administrator
+    Environment=PATH=/usr/bin:/usr/local/bin
+    Environment=NODE_ENV=production
+
+    [Install]
+    WantedBy=multi-user.target
+
+
+3. Enable and Start the Service: 
+    sudo systemctl daemon-reload
+    sudo systemctl enable start-all
+    sudo systemctl start start-all
+
+
+
+    sudo systemctl disable start-all
+    sudo systemctl stop start-all
+
+
+4. Check if it's Running:
+    sudo systemctl status start-all
+    journalctl -u start-all -e
+
+
+
+sudo systemctl enable ollama
+sudo systemctl start ollama
+sudo systemctl start ollama
+sudo systemctl status ollama
+

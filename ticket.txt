@@ -1,0 +1,411 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using MySql.Data.MySqlClient;
+using System.Data;
+using BACKEND.Models;
+using Microsoft.AspNetCore.SignalR;
+using BACKEND.Hubs;
+
+namespace BACKEND.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class TicketController : ControllerBase
+    {
+        private readonly IConfiguration _configuration;
+        private readonly IHubContext<NotificationHub> _hubContext;
+        public TicketController(IConfiguration configuration, IHubContext<NotificationHub> hubContext)
+        {
+            _configuration = configuration;
+            _hubContext = hubContext;
+        }
+
+        private MySqlConnection GetConnection()
+        {
+            return new MySqlConnection(_configuration.GetConnectionString("InvAppCon"));
+        }
+        [HttpGet("GettAllTickets")]
+        public IActionResult GettAllTickets()
+        {
+            string query = "SELECT *FROM tbl_Tickets";
+
+            DataTable table = new();
+            try
+            {
+                using (var con = GetConnection())
+                {
+                    using (var cmd = new MySqlCommand(query, con))
+                    {
+                        con.Open();
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            table.Load(reader);
+                        }
+                    }
+                }
+                return Ok(table);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
+
+        [HttpGet("GetTicketByUser/{fromemail}")]
+        public IActionResult GetTicketByUser(string fromemail)
+        {
+            string query = @"SELECT TicketId, TicketNumber, PropNo, FullName, Email, RequestDate,
+                                    HelpTopic, IssueDesc, Location, PriorityLevel, CurrentStatus,
+                                    LastUpdated, DueDate, Overdue, AgentAssigned
+                             FROM tbl_Tickets
+                             WHERE Email = @FromEmail";
+
+            DataTable table = new();
+            try
+            {
+                using (var con = GetConnection())
+                {
+                    using (var cmd = new MySqlCommand(query, con))
+                    {
+                        cmd.Parameters.AddWithValue("@FromEmail", fromemail);
+                        con.Open();
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            table.Load(reader);
+                        }
+                    }
+                }
+                return Ok(table);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
+        //     [HttpGet("GetTicketStats")]
+        //     public IActionResult GetTicketStats()
+        //     {
+        //         string query = @"
+        //     SELECT DATE(RequestDate) as Date,
+        //            COUNT(*) as Created,
+        //            SUM(CASE WHEN CurrentStatus IN ('Resolved','Closed') THEN 1 ELSE 0 END) as Closed,
+        //            SUM(CASE WHEN CurrentStatus = 'Reopened' THEN 1 ELSE 0 END) as Reopened,
+        //            SUM(CASE WHEN AgentAssigned IS NOT NULL AND AgentAssigned <> '' THEN 1 ELSE 0 END) as Assigned,
+        //            SUM(CASE WHEN Overdue = 1 THEN 1 ELSE 0 END) as Overdue
+        //     FROM tbl_Tickets
+        //     GROUP BY DATE(RequestDate)
+        //     ORDER BY Date;
+        // ";
+
+        //         var stats = new List<object>();
+
+        //         try
+        //         {
+        //             using (var con = GetConnection())
+        //             using (var cmd = new MySqlCommand(query, con))
+        //             {
+        //                 con.Open();
+        //                 using (var reader = cmd.ExecuteReader())
+        //                 {
+        //                     while (reader.Read())
+        //                     {
+        //                         stats.Add(new
+        //                         {
+        //                             Date = reader["Date"].ToString(),
+        //                             Created = Convert.ToInt32(reader["Created"]),
+        //                             Closed = Convert.ToInt32(reader["Closed"]),
+        //                             Reopened = Convert.ToInt32(reader["Reopened"]),
+        //                             Assigned = Convert.ToInt32(reader["Assigned"]),
+        //                             Overdue = Convert.ToInt32(reader["Overdue"])
+        //                         });
+        //                     }
+        //                 }
+        //             }
+        //             return Ok(stats);
+        //         }
+        //         catch (Exception ex)
+        //         {
+        //             return StatusCode(500, $"Internal Server Error: {ex.Message}");
+        //         }
+        //     }
+
+
+        //         [HttpGet("GetTicketStats")]
+        // public IActionResult GetTicketStats()
+        // {
+        //     string query = @"
+        //         SELECT 
+        //             YEAR(RequestDate) AS Year,
+        //             MONTH(RequestDate) AS Month,
+        //             COUNT(*) AS Created,
+        //             SUM(CASE WHEN CurrentStatus IN ('Resolved','Closed') THEN 1 ELSE 0 END) AS Closed,
+        //             SUM(CASE WHEN CurrentStatus = 'Reopened' THEN 1 ELSE 0 END) AS Reopened,
+        //             SUM(CASE WHEN AgentAssigned IS NOT NULL AND AgentAssigned <> '' THEN 1 ELSE 0 END) AS Assigned,
+        //             SUM(CASE WHEN Overdue = 1 THEN 1 ELSE 0 END) AS Overdue
+        //         FROM tbl_Tickets
+        //         GROUP BY YEAR(RequestDate), MONTH(RequestDate)
+        //         ORDER BY Year, Month;
+        //     ";
+
+        //     var stats = new List<object>();
+
+        //     try
+        //     {
+        //         using (var con = GetConnection())
+        //         using (var cmd = new MySqlCommand(query, con))
+        //         {
+        //             con.Open();
+        //             using (var reader = cmd.ExecuteReader())
+        //             {
+        //                 while (reader.Read())
+        //                 {
+        //                     stats.Add(new
+        //                     {
+        //                         Year = Convert.ToInt32(reader["Year"]),
+        //                         Month = Convert.ToInt32(reader["Month"]),
+        //                         Created = Convert.ToInt32(reader["Created"]),
+        //                         Closed = Convert.ToInt32(reader["Closed"]),
+        //                         Reopened = Convert.ToInt32(reader["Reopened"]),
+        //                         Assigned = Convert.ToInt32(reader["Assigned"]),
+        //                         Overdue = Convert.ToInt32(reader["Overdue"])
+        //                     });
+        //                 }
+        //             }
+        //         }
+        //         return Ok(stats);
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         return StatusCode(500, $"Internal Server Error: {ex.Message}");
+        //     }
+        // }
+
+[HttpGet("GetTicketStats")]
+public IActionResult GetTicketStats([FromQuery] string? fromDate = null, [FromQuery] string? toDate = null)
+{
+    string query = @"
+        SELECT 
+            YEAR(RequestDate) AS Year,
+            MONTH(RequestDate) AS Month,
+            COUNT(*) AS Created,
+            SUM(CASE WHEN CurrentStatus IN ('Resolved','Closed') THEN 1 ELSE 0 END) AS Closed,
+            SUM(CASE WHEN CurrentStatus = 'Reopened' THEN 1 ELSE 0 END) AS Reopened,
+            SUM(CASE WHEN AgentAssigned IS NOT NULL AND AgentAssigned <> '' THEN 1 ELSE 0 END) AS Assigned,
+            SUM(CASE WHEN Overdue = 1 THEN 1 ELSE 0 END) AS Overdue
+        FROM tbl_Tickets
+        WHERE (@FromDate IS NULL OR RequestDate >= @FromDate)
+          AND (@ToDate IS NULL OR RequestDate <= @ToDate)
+        GROUP BY YEAR(RequestDate), MONTH(RequestDate)
+        ORDER BY Year, Month;
+    ";
+
+    var stats = new List<object>();
+
+    try
+    {
+        using (var con = GetConnection())
+        using (var cmd = new MySqlCommand(query, con))
+        {
+            cmd.Parameters.AddWithValue("@FromDate", string.IsNullOrEmpty(fromDate) ? DBNull.Value : DateTime.Parse(fromDate));
+            cmd.Parameters.AddWithValue("@ToDate", string.IsNullOrEmpty(toDate) ? DBNull.Value : DateTime.Parse(toDate));
+
+            con.Open();
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    stats.Add(new
+                    {
+                        Year = Convert.ToInt32(reader["Year"]),
+                        Month = Convert.ToInt32(reader["Month"]),
+                        Created = Convert.ToInt32(reader["Created"]),
+                        Closed = Convert.ToInt32(reader["Closed"]),
+                        Reopened = Convert.ToInt32(reader["Reopened"]),
+                        Assigned = Convert.ToInt32(reader["Assigned"]),
+                        Overdue = Convert.ToInt32(reader["Overdue"])
+                    });
+                }
+            }
+        }
+        return Ok(stats);
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, $"Internal Server Error: {ex.Message}");
+    }
+}
+
+
+        // [HttpGet("GetAllProp")]
+        // public IActionResult GetAllProp()
+        // {
+        //     string query = "SELECT PropNo FROM Assets";
+
+        //     DataTable table = new();
+        //     try
+        //     {
+        //         using (var con = GetConnection())
+        //         {
+        //             using (var cmd = new MySqlCommand(query, con))
+        //             {
+        //                 con.Open();
+        //                 using (var reader = cmd.ExecuteReader())
+        //                 {
+        //                     table.Load(reader);
+        //                 }
+        //             }
+        //         }
+        //         return Ok(table);
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         return StatusCode(500, $"Internal Server Error: {ex.Message}");
+        //     }
+        // }
+
+        [HttpPost("AddTicket")]
+        public async Task<IActionResult> AddTicket(Ticket ticket)
+        {
+            string query = @"INSERT INTO tbl_Tickets (TicketNumber, PropNo, FullName, Email, RequestDate,
+                                                  HelpTopic, IssueDesc, Location, PriorityLevel,
+                                                  CurrentStatus, LastUpdated, DueDate, Overdue,
+                                                   AgentAssigned)
+                             VALUES (@TicketNumber, @PropNo, @FullName, @Email, @RequestDate,
+                                     @HelpTopic, @IssueDesc, @Location, @PriorityLevel,
+                                     @CurrentStatus, @LastUpdated, @DueDate, @Overdue,
+                     @AgentAssigned)";
+
+            try
+            {
+                using (var con = GetConnection())
+                {
+                    using (var cmd = new MySqlCommand(query, con))
+                    {
+                        cmd.Parameters.AddWithValue("@TicketNumber", ticket.TicketNumber);
+                        cmd.Parameters.AddWithValue("@PropNo", ticket.PropNo);
+                        cmd.Parameters.AddWithValue("@FullName", ticket.FullName);
+                        cmd.Parameters.AddWithValue("@Email", ticket.Email);
+                        cmd.Parameters.AddWithValue("@RequestDate", ticket.RequestDate);
+                        cmd.Parameters.AddWithValue("@HelpTopic", ticket.HelpTopic);
+                        cmd.Parameters.AddWithValue("@IssueDesc", ticket.IssueDesc);
+                        cmd.Parameters.AddWithValue("@Location", ticket.Location);
+                        cmd.Parameters.AddWithValue("@PriorityLevel", ticket.PriorityLevel);
+                        cmd.Parameters.AddWithValue("@CurrentStatus", ticket.CurrentStatus);
+                        cmd.Parameters.AddWithValue("@LastUpdated", ticket.LastUpdated);
+                        cmd.Parameters.AddWithValue("@DueDate", ticket.DueDate);
+                        cmd.Parameters.AddWithValue("@Overdue", ticket.Overdue);
+                        cmd.Parameters.AddWithValue("@AgentAssigned", ticket.AgentAssigned);
+                        con.Open();
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+
+                await _hubContext.Clients.All.SendAsync("TicketAdded", ticket);
+
+                return Ok(new { message = "Added Successfully" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
+
+
+        [HttpPut("UpdateStatus/{id}")]
+        public IActionResult UpdateStatus(int id, [FromBody] TicketStatusDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.CurrentStatus))
+                return BadRequest(new { message = "CurrentStatus is required" });
+
+            string query = @"UPDATE tbl_Tickets 
+                     SET CurrentStatus = @CurrentStatus, 
+                          AgentAssigned = @AgentAssigned,
+                          LastUpdated = NOW()
+                     WHERE TicketId = @TicketId";
+
+            using (var con = GetConnection())
+            using (var cmd = new MySqlCommand(query, con))
+            {
+                cmd.Parameters.AddWithValue("@CurrentStatus", dto.CurrentStatus);
+                cmd.Parameters.AddWithValue("@AgentAssigned", dto.AgentAssigned ?? "Unassigned");
+                cmd.Parameters.AddWithValue("@TicketId", id);
+
+                con.Open();
+                int rowsAffected = cmd.ExecuteNonQuery();
+
+                if (rowsAffected == 0)
+                    return NotFound(new { message = "Ticket not found" });
+            }
+
+            return Ok(new
+            {
+                message = "Ticket status updated successfully",
+                updatedStatus = dto.CurrentStatus,
+                agent = dto.AgentAssigned,
+                lastUpdated = DateTime.Now
+            });
+        }
+        [HttpPut("UpdateOverdueTickets")]
+        public IActionResult UpdateOverdueTickets()
+        {
+            string query = @"UPDATE tbl_Tickets
+             SET Overdue = CASE 
+                 WHEN DueDate IS NOT NULL AND CURDATE() > DATE(DueDate) THEN 1
+                 ELSE 0
+             END;";
+
+            try
+            {
+                using (var con = GetConnection())
+                {
+                    using (var cmd = new MySqlCommand(query, con))
+                    {
+                        con.Open();
+                        int rows = cmd.ExecuteNonQuery();
+                        return Ok(new { message = $"{rows} tickets updated for overdue status." });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
+
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteTicket(int id)
+        {
+            string query = "DELETE FROM tbl_Tickets WHERE TicketId = @TicketId";
+
+            try
+            {
+                using (var con = GetConnection())
+                {
+                    using (var cmd = new MySqlCommand(query, con))
+                    {
+                        cmd.Parameters.AddWithValue("@TicketId", id);
+                        con.Open();
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+                return Ok(new { message = "Deleted Successfully" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
+        [HttpDelete("DeleteMessagesByTicket/{ticketId}")]
+        public IActionResult DeleteMessagesByTicket(int ticketId)
+        {
+            using var conn = GetConnection();
+            conn.Open();
+            using var cmd = new MySqlCommand("DELETE FROM tbl_TicketMessages WHERE TicketId = @TicketId", conn);
+            cmd.Parameters.AddWithValue("@TicketId", ticketId);
+            cmd.ExecuteNonQuery();
+            return Ok(new { message = "All messages deleted for ticket." });
+        }
+
+    }
+}
